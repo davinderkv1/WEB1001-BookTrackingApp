@@ -10,6 +10,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using BookTrackingApp.Data;
+using Microsoft.AspNetCore.ResponseCompression;
 
 namespace BookTrackingApp
 {
@@ -24,11 +25,22 @@ namespace BookTrackingApp
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
-        {
+        {   
             services.AddRazorPages();
 
             services.AddDbContext<BookTrackingAppContext>(options =>
                     options.UseSqlServer(Configuration.GetConnectionString("BookTrackingAppContext")));
+
+            //adding compression
+
+            services.AddResponseCompression(options =>
+            {
+                options.Providers.Add<BrotliCompressionProvider>();
+                options.Providers.Add<GzipCompressionProvider>();
+                options.MimeTypes =
+                    ResponseCompressionDefaults.MimeTypes.Concat(
+                        new[] { "image/svg+xml" });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
